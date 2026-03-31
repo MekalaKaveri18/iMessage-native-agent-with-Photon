@@ -1,0 +1,24 @@
+{
+  "name": "situation-room",
+  "version": "1.0.0",
+  "description": "iMessage agent that gives you clear decisions in under 60 seconds.",
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/agent.ts",
+    "dev": "tsx watch src/agent.ts",
+    "build": "tsc",
+    "test": "tsx src/test-runner.ts"
+  },
+  "dependencies": {
+    "groq-sdk": "^0.9.1",
+    "@photon-ai/imessage-kit": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "tsx": "^4.19.1",
+    "typescript": "^5.4.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

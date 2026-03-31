@@ -1,0 +1,54 @@
+name: Situation Room – macOS Demo
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      dilemma:
+        description: "The dilemma to send to the agent"
+        required: false
+        default: "I have two job offers. One pays 40% more but the work sounds boring. The other is exciting but risky. I have 24 hours to decide."
+
+jobs:
+  run-on-mac:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Check API key is set
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+        run: |
+          if [ -z "$GROQ_API_KEY" ]; then
+            echo "GROQ_API_KEY secret is not set."
+            echo "Get a free key at https://console.groq.com"
+            echo "Go to: Settings -> Secrets and variables -> Actions -> New repository secret"
+            echo "Name: GROQ_API_KEY   Value: gsk_..."
+            exit 1
+          fi
+          echo "API key found."
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run agent smoke test
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          TEST_DILEMMA: ${{ github.event.inputs.dilemma || 'I have two job offers. One pays 40% more but the work sounds boring. The other is exciting but risky. I have 24 hours to decide.' }}
+        run: npx tsx src/test-runner.ts
+
+      - name: Upload decision log
+        uses: actions/upload-artifact@v4
+        with:
+          name: situation-room-output
+          path: data/
+          if-no-files-found: warn
